@@ -3,7 +3,7 @@
 #property version   "1.00"
 #property strict
 
-input int magicNumer = 1;
+input int magicNumber = 1;
 input bool lookupAndSendOrders = true;
 input string baseUrl = "http://localhost";
 
@@ -20,6 +20,8 @@ int OnInit()
        Print("Could not create the instrument in the backend.");
        return(INIT_FAILED);
    }
+   
+   sendTickData();
    
    return(INIT_SUCCEEDED);
 }
@@ -79,7 +81,7 @@ bool sendProbe()
 
 void sendTickData()
 {
-   string payload = StringConcatenate("I=", Symbol(), "&B=", Bid, "&A=", Ask, "&T=", TimeToString(TimeCurrent()));
+   string payload = StringConcatenate("I=", Symbol(), "&B=", Bid, "&A=", Ask);
    char payloadChar[];
    char result[];
    string headers = "Content-Type: application/x-www-form-urlencoded";
@@ -100,7 +102,7 @@ void sendTickData()
 
 bool sendCreateInstrument()
 {
-   string payload = StringConcatenate("N=", Symbol(), "&D=", Digits);
+   string payload = StringConcatenate("N=", Symbol(), "&D=", Digits, "&M=", IntegerToString(magicNumber));
    char payloadChar[];
    char result[];
    string headers = "Content-Type: application/x-www-form-urlencoded";
@@ -113,7 +115,7 @@ bool sendCreateInstrument()
    while (status != 200 && i <= 5) {
       status = WebRequest("POST", url, NULL, NULL, GetTickCount(), payloadChar, ArraySize(payloadChar), result, headers);
       Print("-----------------------------");
-      Print("Payload: ", payload, " || Response code: ", status);
+      Print("Payload: ", payload, " || Response code: ", status, " || Endpoint: /instrument/create");
       Print("-----------------------------");
       i++;
    }
