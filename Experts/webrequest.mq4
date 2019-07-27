@@ -4,7 +4,6 @@
 #property strict
 
 input int magicNumer = 1;
-input bool testConnection = true;
 input bool lookupAndSendOrders = true;
 input string baseUrl = "http://localhost";
 
@@ -12,14 +11,10 @@ int maxRetries = 5;
 
 int OnInit()
 {  
-   if (testConnection) {
-      sendProbe();
+   if (!sendProbe()) {
+      Print("Could not establish connection with the backend.");
+       return(INIT_FAILED);
    }
-   
-   if (lookupAndSendOrders) {
-      
-   }
-   //sendTickData();
    
    return(INIT_SUCCEEDED);
 }
@@ -57,7 +52,7 @@ void loopOrdes(string symbol,int magicNumber)
    }
 }
 
-void sendProbe()
+bool sendProbe()
 {
    char data[];
    char result[];
@@ -73,6 +68,8 @@ void sendProbe()
       Print("-------------------------------");
       i++;
    }
+   
+   return status == 200;
 }
 
 void sendTickData()
