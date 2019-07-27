@@ -4,8 +4,9 @@
 #property strict
 
 input int magicNumer = 1;
-input bool testConnection = false;
+input bool testConnection = true;
 input bool lookupAndSendOrders = true;
+input string baseUrl = "http://localhost";
 
 int maxRetries = 5;
 
@@ -18,7 +19,7 @@ int OnInit()
    if (lookupAndSendOrders) {
       
    }
-   sendTickData();
+   //sendTickData();
    
    return(INIT_SUCCEEDED);
 }
@@ -63,9 +64,10 @@ void sendProbe()
    string headers;
    int i = 1;
    int status = -1;
+   string url = StringConcatenate(baseUrl, "/probe");
    
    while (status != 200 && i <= 5) {
-      status = WebRequest("POST", "http://localhost/public/probe", NULL, NULL, GetTickCount(), data, ArraySize(data), result, headers);
+      status = WebRequest("POST", url, NULL, NULL, GetTickCount(), data, ArraySize(data), result, headers);
       Print("-------------------------------");
       Print("Status code: ", IntegerToString(status));
       Print("-------------------------------");
@@ -81,11 +83,12 @@ void sendTickData()
    string headers = "Content-Type: application/x-www-form-urlencoded";
    int i = 1;
    int status = -1;
+   string url = StringConcatenate(baseUrl, "/tick");
    
    StringToCharArray(payload, payloadChar);
    
    while (status != 200 && i <= 5) {
-      status = WebRequest("POST", "http://localhost/public/tick", NULL, NULL, GetTickCount(), payloadChar, ArraySize(payloadChar), result, headers);
+      status = WebRequest("POST", url, NULL, NULL, GetTickCount(), payloadChar, ArraySize(payloadChar), result, headers);
       Print("-----------------------------");
       Print("Payload: ", payload, " || Response code: ", status);
       Print("-----------------------------");
