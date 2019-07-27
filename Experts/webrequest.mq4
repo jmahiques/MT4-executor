@@ -13,6 +13,11 @@ int OnInit()
 {  
    if (!sendProbe()) {
       Print("Could not establish connection with the backend.");
+      return(INIT_FAILED);
+   }
+   
+   if (!sendCreateInstrument()) {
+       Print("Could not create the instrument in the backend.");
        return(INIT_FAILED);
    }
    
@@ -91,4 +96,27 @@ void sendTickData()
       Print("-----------------------------");
       i++;
    }
+}
+
+bool sendCreateInstrument()
+{
+   string payload = StringConcatenate("N=", Symbol(), "&D=", Digits);
+   char payloadChar[];
+   char result[];
+   string headers = "Content-Type: application/x-www-form-urlencoded";
+   int i = 1;
+   int status = -1;
+   string url = StringConcatenate(baseUrl, "/instrument/create");
+   
+   StringToCharArray(payload, payloadChar);
+   
+   while (status != 200 && i <= 5) {
+      status = WebRequest("POST", url, NULL, NULL, GetTickCount(), payloadChar, ArraySize(payloadChar), result, headers);
+      Print("-----------------------------");
+      Print("Payload: ", payload, " || Response code: ", status);
+      Print("-----------------------------");
+      i++;
+   }
+   
+   return status == 200;
 }
